@@ -1,0 +1,7 @@
+libcamsrcjpegenc-sw-libjpeg (0.1.4-0) unstable; urgency=low
+
+  * Initial release
+  * Git: pkgs/l/libcamsrcjpegenc-sw-libjpeg
+  * Tag: libcamsrcjpegenc-sw-libjpeg_0.1.4-0
+
+ -- Jeongmo Yang <jm80.yang@samsung.com>  Wed, 07 Dec 2011 12:38:25 +0900
