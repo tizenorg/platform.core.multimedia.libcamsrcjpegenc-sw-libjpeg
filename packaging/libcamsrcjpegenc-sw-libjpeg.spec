@@ -1,5 +1,5 @@
 Name:       libcamsrcjpegenc-sw-libjpeg
-Summary:    Multimedia Framework Camera Src Jpeg Encoder Library (libjpeg) (unstripped)
+Summary:    Multimedia Framework Camera Src Jpeg Encoder Library (libjpeg)
 Version:    0.1.4
 Release:    2
 Group:      libdevel
