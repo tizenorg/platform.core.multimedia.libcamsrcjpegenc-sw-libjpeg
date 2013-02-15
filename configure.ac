@@ -67,7 +67,6 @@ AC_SUBST(LIBJPEG_LIBS)
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
-                 camsrcjpegenc-sw.pc
 ])
 AC_OUTPUT
 
