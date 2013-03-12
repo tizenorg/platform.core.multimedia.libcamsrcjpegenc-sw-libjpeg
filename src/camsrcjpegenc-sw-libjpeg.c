@@ -59,10 +59,9 @@
 #define I420_SIZE(w,h)     (I420_V_OFFSET(w,h)+(I420_V_ROWSTRIDE(w)*JPEGENC_ROUND_UP_2(h)/2))
 
 /* Limitations */
-#define MAX_JPG_WIDTH               2560
-#define MAX_JPG_HEIGHT              1920
-#define MAX_YUV_SIZE                (MAX_JPG_WIDTH * MAX_JPG_HEIGHT * 3)
-#define MAX_ENCODED_RESULT_SIZE               (MAX_JPG_WIDTH * MAX_JPG_HEIGHT / 3)
+#define MAX_JPG_WIDTH                           3264
+#define MAX_JPG_HEIGHT                          2448
+#define MAX_ENCODED_RESULT_SIZE(width, height)  ((width * height * 2) / 3)
 
 
 /* To use dlog instead of printf */
@@ -197,6 +196,7 @@ int  camsrcjpegencsub_encode ( jpegenc_parameter *enc_param )
 	/* video state */
 	unsigned int width, height;
 	int bufsize = 0;
+	int result_alloc_size = 0;
 
 	/* the jpeg line buffer */
 	guchar **line[3];
@@ -323,14 +323,16 @@ int  camsrcjpegencsub_encode ( jpegenc_parameter *enc_param )
 
 	_jpegenc_libjpegsw_info ("Set quality");
 
-	enc_param->result_data = malloc(MAX_ENCODED_RESULT_SIZE);
+	result_alloc_size = MAX_ENCODED_RESULT_SIZE(width, height);
+	enc_param->result_data = malloc(result_alloc_size);
 	jdest.next_output_byte = enc_param->result_data;
-	jdest.free_in_buffer = MAX_ENCODED_RESULT_SIZE;
+	jdest.free_in_buffer = result_alloc_size;
 
 	_jpegenc_libjpegsw_info ("compress start(%p, %d, %p, %d)", src_data, src_len, jdest.next_output_byte, jdest.free_in_buffer);
 	jpeg_start_compress (&cinfo, TRUE);
 
-	_jpegenc_libjpegsw_info ("got buffer of %lu bytes", src_len);
+	_jpegenc_libjpegsw_info ("got src buffer of %lu bytes", src_len);
+	_jpegenc_libjpegsw_info ("allocated result buffer size %d bytes", result_alloc_size);
 
 	switch (src_fmt) {
 		case COLOR_FORMAT_I420:
@@ -385,11 +387,12 @@ int  camsrcjpegencsub_encode ( jpegenc_parameter *enc_param )
 		break;
 	}
 
-	_jpegenc_libjpegsw_info ("compressing DONE");
-
-	enc_param->result_len = JPEGENC_ROUND_UP_4 (MAX_ENCODED_RESULT_SIZE - jdest.free_in_buffer);
-	
 	jpeg_finish_compress (&cinfo);
+
+	_jpegenc_libjpegsw_info("compressing DONE");
+
+	enc_param->result_len = JPEGENC_ROUND_UP_4(result_alloc_size - jdest.free_in_buffer);
+	
 	jpeg_destroy_compress(&cinfo);
 
 	if( enc_param->src_fmt != COLOR_FORMAT_I420 && enc_param->src_fmt != COLOR_FORMAT_RGB )
@@ -473,7 +476,12 @@ _jpegenc_convert_YUV_to_RGB888( unsigned char *src, int src_fmt, guint width, gu
 		return FALSE;
 	}
 
-	mm_util_get_image_size( dst_cs, width, height, &dst_size );
+	ret = mm_util_get_image_size( dst_cs, width, height, &dst_size );
+	if (ret != 0) {
+		_jpegenc_libjpegsw_error("mm_util_get_image_size failed [%x]\n", ret);
+		return FALSE;
+	}
+
 	*dst = malloc( dst_size );
 	if( *dst == NULL )
 	{
