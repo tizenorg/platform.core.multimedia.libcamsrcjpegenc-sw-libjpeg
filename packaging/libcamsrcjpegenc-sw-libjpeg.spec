@@ -1,7 +1,7 @@
 Name:       libcamsrcjpegenc-sw-libjpeg
 Summary:    Multimedia Framework Camera Src Jpeg Encoder Library (libjpeg)
 Version:    0.1.6
-Release:    1
+Release:    2
 Group:      libdevel
 License:    Apache-2.0
 Source0:    %{name}-%{version}.tar.gz

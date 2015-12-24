@@ -366,6 +366,10 @@ int  camsrcjpegencsub_encode ( jpegenc_parameter *enc_param )
 				}
 				jpeg_write_raw_data (&cinfo, line, 2 * DCTSIZE);
 			}
+
+			free(line[0]);
+			free(line[1]);
+			free(line[2]);
 		}
 		break;
 		case COLOR_FORMAT_RGB:
